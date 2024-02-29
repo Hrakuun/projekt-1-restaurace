@@ -15,14 +15,14 @@ public class Dish {
 
 //    endregion
 // region constructors
-    public Dish(String title, BigDecimal price, int preparationTime, String image) {
+    public Dish(String title, BigDecimal price, int preparationTime, String image) throws RestaurantException {
         this.title = title;
-        this.price = price;
-        this.preparationTime = preparationTime;
-        this.image = image;
+        setPrice(price);
+        setPreparationTime(preparationTime);
+        setImage(image);
     }
 
-    public Dish(String title, BigDecimal price, int preparationTime) {
+    public Dish(String title, BigDecimal price, int preparationTime) throws RestaurantException {
         this(title,price,preparationTime, "blank");
     }
 //    endregion
@@ -39,7 +39,10 @@ public class Dish {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(BigDecimal price) throws RestaurantException {
+        if(price.compareTo(BigDecimal.ZERO) <=0){
+            throw new RestaurantException("Cena musí být větší než nula!");
+        }
         this.price = price;
     }
 
@@ -48,6 +51,9 @@ public class Dish {
     }
 
     public void setPreparationTime(int preparationTime) throws RestaurantException {
+        if(preparationTime <= 0){
+            throw new RestaurantException("Čas přípravy pokrmu musí být větší než nula!");
+        }
         this.preparationTime = preparationTime;
     }
 
@@ -55,7 +61,10 @@ public class Dish {
         return image;
     }
 
-    public void setImage(String image) {
+    public void setImage(String image) throws RestaurantException {
+        if(image.isBlank()){
+            throw new RestaurantException("Položka musí mít zadán název obrázku!");
+        }
         this.image = image;
     }
 //    endregion
