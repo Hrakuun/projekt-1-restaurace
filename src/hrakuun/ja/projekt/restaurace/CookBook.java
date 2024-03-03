@@ -2,27 +2,29 @@ package hrakuun.ja.projekt.restaurace;
 
 import java.io.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class CookBook {
     //    region variables
-    private List<Dish> cookBook = new ArrayList();
+    private Map<Integer, Dish> cookBook = new HashMap<>();
     private String fileName = Settings.getCookBookFilePath();
 
+
     // endregion
+
 //    region List handling methods
-    public void addDish(Dish dish) {
-        cookBook.add(dish);
+    public void addDish(Dish dish) throws RestaurantException {
+        cookBook.put(dish.getId(), dish);
+        saveToFile();
     }
 
-    public void removeDish(Dish dish) {
-        cookBook.remove(dish);
+    public void removeDish(Dish dish) throws RestaurantException {
+        cookBook.remove(dish.getId());
+        saveToFile();
     }
 
-    public Dish getDishOnIndex(int index) {
-        return cookBook.get(index);
+    public Dish getDishById(Integer id) {
+        return cookBook.get(id);
     }
 // endregion
 //    region file handling methods
@@ -39,17 +41,20 @@ public class CookBook {
                 BigDecimal price = BigDecimal.valueOf(Long.parseLong(parts[2]));
                 int preparationTime = Integer.parseInt(parts[3]);
                 String image = parts[4];
+                if (!cookBook.containsKey(dishId)) {
+                    cookBook.put(dishId, new Dish(dishId, title, price, preparationTime, image));
+                }
 
             }
         } catch (FileNotFoundException e) {
-            throw new RestaurantException(String.format("Soubor %s nebyl nalezen!\n%s", fileName, e.getLocalizedMessage()));
+
         }
     }
 
-    public void saveToFile(String fileName) throws RestaurantException {
+    public void saveToFile() throws RestaurantException {
         String delimiter = Settings.getDelimiter();
         try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(fileName)))) {
-            for (Dish dish : cookBook) {
+            for (Dish dish : cookBook.values()) {
                 writer.println(
                         dish.getId() + delimiter
                                 + dish.getTitle() + delimiter
@@ -58,13 +63,24 @@ public class CookBook {
                                 + dish.getImage()
                 );
             }
-        } catch (FileNotFoundException e){
-            throw new RestaurantException("Soubor "+fileName+" nenalezen!\n"+e.getLocalizedMessage());
+        } catch (FileNotFoundException e) {
+            throw new RestaurantException("Soubor " + fileName + " nenalezen!\n" + e.getLocalizedMessage());
         } catch (IOException e) {
-            throw new RestaurantException("Chyba při zápisu do souboru: "+fileName+":\n" +e.getLocalizedMessage());
+            throw new RestaurantException("Chyba při zápisu do souboru: " + fileName + ":\n" + e.getLocalizedMessage());
         }
     }
 
+    public void updateCookBook() throws RestaurantException {
+        cookBook.clear();
+        loadFile(fileName);
+    }
+
+//    endregion
+//  region get/set
+
+    public Map<Integer, Dish> getCookBook() {
+        return new HashMap<>(cookBook);
+    }
 
 //    endregion
 }
