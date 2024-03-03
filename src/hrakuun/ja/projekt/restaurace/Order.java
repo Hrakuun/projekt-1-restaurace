@@ -3,37 +3,60 @@ package hrakuun.ja.projekt.restaurace;
 import java.time.LocalDateTime;
 
 public class Order {
-// region variables
-    private static int orderId = 1;
-    private Dish dish;
+    // region variables
+    private static int nextId = 1;
+    private int orderId;
+    private int dishId;
     private int quantity;
     private int tableNumber;
     private LocalDateTime orderedTime;
     private LocalDateTime fulfilmentTime;
     private boolean isPaid;
+
 //    endregion
 
-//    region constructors
-    public Order(Dish dish, int quantity, int tableNumber, LocalDateTime orderedTime, boolean isPaid) {
-        this.dish = dish;
+    //    region constructors
+    public Order(int dishId, int quantity, int tableNumber, LocalDateTime orderedTime, boolean isPaid) {
+        this.dishId = dishId;
         this.quantity = quantity;
         this.tableNumber = tableNumber;
         this.orderedTime = orderedTime;
         this.isPaid = isPaid;
-        orderId++;
+        this.orderId = nextId;
+        nextId++;
     }
-//    endregion
+
+    public Order(Dish dish, int quantity, int tableNumber, LocalDateTime orderedTime, boolean isPaid) {
+        this.dishId = dish.getId();
+        this.quantity = quantity;
+        this.tableNumber = tableNumber;
+        this.orderedTime = orderedTime;
+        this.isPaid = isPaid;
+        this.orderId = nextId;
+        nextId++;
+    }
+
+    public Order(int orderId, int dishId, int quantity, int tableNumber, LocalDateTime orderedTime, boolean isPaid) {
+        this.orderId = orderId;
+        this.dishId = dishId;
+        this.quantity = quantity;
+        this.tableNumber = tableNumber;
+        this.orderedTime = orderedTime;
+        this.isPaid = isPaid;
+    }
+    //    endregion
 
 //    region methods
+
 //    endregion
 
-//    region set/get
-    public Dish getDish() {
-        return dish;
+    //    region set/get
+    public int getDishId() {
+        return dishId;
     }
 
-    public void setDish(Dish dish) {
-        this.dish = dish;
+    public void setDishId(int dishId) {
+        this.dishId = dishId;
     }
 
     public int getQuantity() {
@@ -76,6 +99,13 @@ public class Order {
         isPaid = paid;
     }
 
-//    endregion
+    public int getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
+    }
+    //    endregion
 
 }
