@@ -6,30 +6,30 @@ import java.util.*;
 
 public class CookBook {
     //    region variables
-    private Map<Integer, Dish> cookBook = new HashMap<>();
-    private String fileName = Settings.getCookBookFilePath();
+    private static Map<Integer, Dish> cookBook = new HashMap<>();
+    private static String fileName = Settings.getCookBookFilePath();
 
 
     // endregion
 
 //    region List handling methods
-    public void addDish(Dish dish) throws RestaurantException {
+    public static void addDish(Dish dish) throws RestaurantException {
         cookBook.put(dish.getId(), dish);
         saveToFile();
     }
 
-    public void removeDish(Dish dish) throws RestaurantException {
+    public static void removeDish(Dish dish) throws RestaurantException {
         cookBook.remove(dish.getId());
         saveToFile();
     }
 
-    public Dish getDishById(Integer id) {
+    public static Dish getDishById(Integer id) {
         return cookBook.get(id);
     }
 // endregion
 //    region file handling methods
 
-    public void loadFile(String fileName) throws RestaurantException {
+    public static void loadFile(String fileName) throws RestaurantException {
         int lineCounter = 0;
         try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(fileName)))) {
             while (scanner.hasNextLine()) {
@@ -51,7 +51,7 @@ public class CookBook {
         }
     }
 
-    public void saveToFile() throws RestaurantException {
+    public static void saveToFile() throws RestaurantException {
         String delimiter = Settings.getDelimiter();
         try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(fileName)))) {
             for (Dish dish : cookBook.values()) {
@@ -70,7 +70,7 @@ public class CookBook {
         }
     }
 
-    public void updateCookBook() throws RestaurantException {
+    public static void updateCookBook() throws RestaurantException {
         cookBook.clear();
         loadFile(fileName);
     }
