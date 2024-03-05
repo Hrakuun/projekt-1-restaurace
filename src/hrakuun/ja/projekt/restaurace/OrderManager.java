@@ -1,6 +1,8 @@
 package hrakuun.ja.projekt.restaurace;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +20,14 @@ public class OrderManager {
         order.setFulfilmentTime(LocalDateTime.now());
     }
 
-    public void loadCurrentOrdersFile (String fileName){
+    private boolean doesntFileExist(String fileName){;
+        return Files.notExists(Path.of(fileName));
+
+    }
+    public void loadCurrentOrdersFile (String fileName) throws RestaurantException {
+        if(doesntFileExist(fileName)){
+
+        }
         int lineCounter = 0;
         try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(fileName)))){
             while (scanner.hasNextLine()){
@@ -35,7 +44,7 @@ public class OrderManager {
                 currentOrders.add(order);
             }
         } catch (FileNotFoundException e) {
-
+            throw new RestaurantException("Soubor "+fileName+" nenalezen.");
         }
     }
     public void saveCurrentOrdersFile (String fileName) throws RestaurantException {
