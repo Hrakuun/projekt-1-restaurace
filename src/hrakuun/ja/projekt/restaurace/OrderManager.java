@@ -8,46 +8,46 @@ import java.util.*;
 
 public class OrderManager {
 
-    private static Map<Integer, Order> currentOrders = new HashMap<>();
-    private static String ordersFile = Settings.getOrdersInProgressPath();
+    private static Map<Integer, Order> orders = new HashMap<>();
+    private static String ordersFile = Settings.getOrdersFilePath();
 
 
     public void addOrder(Order order) throws RestaurantException {
-        currentOrders.put(order.getOrderId(), order);
+        orders.put(order.getOrderId(), order);
         saveOrdersFile(ordersFile);
     }
 
     public void removeOrder(Order order) throws RestaurantException {
-        currentOrders.remove(order.getOrderId());
+        orders.remove(order.getOrderId());
         saveOrdersFile(ordersFile);
     }
 
-    public void completeOrder(Order order) {
+    public void completeOrder(Order order) throws RestaurantException {
         if (order.isPaid()) {
             order.setFulfilmentTime(LocalDateTime.now());
         }
+        saveOrdersFile(ordersFile);
     }
 
-    private boolean doesFileExist(String fileName) {
-        ;
+    private static boolean doesFileExist(String fileName) {
         return Files.exists(Path.of(fileName));
     }
 
-    public void loadOrdersFile(String fileName) throws RestaurantException {
+    public static void loadOrdersFile(String fileName) throws RestaurantException {
         if (doesFileExist(fileName)) {
             loadFile(fileName);
         }
     }
 
-    private void loadFile(String fileName) throws RestaurantException {
+    private static void loadFile(String fileName) throws RestaurantException {
         int lineCounter = 0;
         try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(fileName)))) {
             while (scanner.hasNextLine()) {
                 lineCounter++;
                 String line = scanner.nextLine();
                 Order order = getOrderFromLine(line);
-                if (!currentOrders.containsKey(order.getOrderId())) {
-                    currentOrders.put(order.getOrderId(), order);
+                if (!orders.containsKey(order.getOrderId())) {
+                    orders.put(order.getOrderId(), order);
                 }
             }
         } catch (FileNotFoundException e) {
@@ -60,7 +60,7 @@ public class OrderManager {
         }
     }
 
-    private Order getOrderFromLine(String line) {
+    private static Order getOrderFromLine(String line) {
         String[] parts = line.split(Settings.getDelimiter());
         int orderId = Integer.parseInt(parts[0]);
         int dishId = Integer.parseInt(parts[1]);
@@ -75,7 +75,7 @@ public class OrderManager {
     public void saveOrdersFile(String fileName) throws RestaurantException {
         String delimiter = Settings.getDelimiter();
         try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(fileName)))) {
-            for (Order order : currentOrders.values()) {
+            for (Order order : orders.values()) {
                 writer.println(
                         order.getOrderId() + delimiter
                                 + order.getDishId() + delimiter
@@ -92,4 +92,16 @@ public class OrderManager {
         }
     }
 
+    public static List<Order> getAllOrders(){
+        return new ArrayList<>(orders.values());
+    }
+    public static List<Order> getCompletedOrders(){
+        List<Order> completedOrders = new ArrayList<>();
+        for(Order order : getAllOrders()){
+            if(order.isCompleted()){
+                completedOrders.add(order);
+            }
+        }
+        return completedOrders;
+    }
 }
