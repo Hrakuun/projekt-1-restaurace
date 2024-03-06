@@ -31,13 +31,13 @@ public class CookBook {
 
     // endregion
 //    region file handling methods
-    public void loadCookBookFile(String fileName) throws RestaurantException {
+    public static void loadCookBookFile(String fileName) throws RestaurantException {
         if (doesFileExist(fileName)) {
             loadFile(fileName);
         }
     }
 
-    private boolean doesFileExist(String fileName) {
+    private static boolean doesFileExist(String fileName) {
         return Files.exists(Path.of(fileName));
     }
 
