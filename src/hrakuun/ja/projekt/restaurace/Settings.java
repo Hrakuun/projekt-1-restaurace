@@ -9,7 +9,7 @@ public class Settings {
     public static String getCookBookFilePath(){
         return COOKBOOKFILE;
     }
-    public static String getOrdersInProgressPath() {
+    public static String getOrdersFilePath() {
         return ORDERSFILE;
     }
     public static String getDelimiter() {
