@@ -10,7 +10,7 @@ public class Order {
     private int quantity;
     private int tableNumber;
     private LocalDateTime orderedTime;
-    private LocalDateTime fulfilmentTime;
+    private LocalDateTime fulfilmentTime = null;
     private boolean isPaid;
 
 //    endregion
@@ -46,8 +46,10 @@ public class Order {
     }
     //    endregion
 
-//    region methods
-
+    //    region methods
+    public boolean isCompleted() {
+        return fulfilmentTime.equals(null);
+    }
 //    endregion
 
     //    region set/get
