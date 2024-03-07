@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.time.LocalDate;
 
 public class OrderManager {
 
@@ -92,13 +93,25 @@ public class OrderManager {
         }
     }
 
-    public static List<Order> getAllOrders(){
+    public static List<Order> getTodayOrders() {
+        List<Order> todayOrders = new ArrayList<>();
+//        getAllOrders().stream().filter(order -> order.getOrderedTime().toLocalDate().atStartOfDay().equals(LocalDate.now())).toList(order);
+        for(Order order : getAllOrders()){
+            if(order.getOrderedTime().toLocalDate().equals(LocalDate.now())){
+                todayOrders.add(order);
+            }
+        }
+        return todayOrders;
+    }
+
+    public static List<Order> getAllOrders() {
         return new ArrayList<>(orders.values());
     }
-    public static List<Order> getCompletedOrders(){
+
+    public static List<Order> getCompletedOrders() {
         List<Order> completedOrders = new ArrayList<>();
-        for(Order order : getAllOrders()){
-            if(order.isCompleted()){
+        for (Order order : getAllOrders()) {
+            if (order.isCompleted()) {
                 completedOrders.add(order);
             }
         }
