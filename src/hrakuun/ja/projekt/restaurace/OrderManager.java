@@ -68,9 +68,9 @@ public class OrderManager {
         int quantity = Integer.parseInt(parts[2]);
         int tableNumber = Integer.parseInt(parts[3]);
         LocalDateTime orderedTime = LocalDateTime.parse(parts[4]);
-        boolean isPaid = Boolean.parseBoolean(parts[5]);
-        Order order = new Order(orderId, dishId, quantity, tableNumber, orderedTime, isPaid);
-        return order;
+        LocalDateTime fulfilmentTime = LocalDateTime.parse(parts[5]);
+        boolean isPaid = Boolean.parseBoolean(parts[6]);
+        return new Order(orderId, dishId, quantity, tableNumber, orderedTime, fulfilmentTime, isPaid);
     }
 
     public void saveOrdersFile(String fileName) throws RestaurantException {
@@ -83,6 +83,7 @@ public class OrderManager {
                                 + order.getQuantity() + delimiter
                                 + order.getTableNumber() + delimiter
                                 + order.getOrderedTime() + delimiter
+                                + order.getFulfilmentTime() + delimiter
                                 + order.isPaid()
                 );
             }
@@ -96,8 +97,8 @@ public class OrderManager {
     public static List<Order> getTodayOrders() {
         List<Order> todayOrders = new ArrayList<>();
 //        getAllOrders().stream().filter(order -> order.getOrderedTime().toLocalDate().atStartOfDay().equals(LocalDate.now())).toList(order);
-        for(Order order : getAllOrders()){
-            if(order.getOrderedTime().toLocalDate().equals(LocalDate.now())){
+        for (Order order : getAllOrders()) {
+            if (order.getOrderedTime().toLocalDate().equals(LocalDate.now())) {
                 todayOrders.add(order);
             }
         }
@@ -116,5 +117,15 @@ public class OrderManager {
             }
         }
         return completedOrders;
+    }
+
+    public static List<Order> getOrdersForTable(int tableNo) {
+        List<Order> ordersOnTableNo = new ArrayList<>();
+        for (Order order : getAllOrders()) {
+            if (order.getTableNumber() == tableNo) {
+                ordersOnTableNo.add(order);
+            }
+        }
+        return ordersOnTableNo;
     }
 }

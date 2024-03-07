@@ -55,4 +55,34 @@ public class RestaurantManager {
         return dishIds;
     }
 
+    private String tableNoToString(int tableNo){
+        String tableNoString = String.valueOf(tableNo);
+        if(tableNoString.length() < 2){
+            tableNoString = " " + String.valueOf(tableNo);
+        }
+        return tableNoString;
+    }
+    private String headlineOfReport(int tableNo){
+        return String.format("** Objednávky pro stůl č. %s **",tableNoToString(tableNo));
+    }
+    private String lineOfReport(Order order, int lineCounter){
+        return lineCounter + ". " + order.stringOutput() + "\n";
+    }
+    private String linesOrdersReport(List<Order> orders){
+        int lineCounter = 1;
+        StringBuilder report = new StringBuilder();
+        for(Order order : orders){
+            report.append(lineOfReport(order, lineCounter));
+            lineCounter++;
+        }
+        return report.toString();
+    }
+
+    public String ordersOnTableReport(int tableNo){
+        List<Order> orders = OrderManager.getOrdersForTable(tableNo);
+        String report;
+        report = headlineOfReport(tableNo) + "\n****\n" + linesOrdersReport(orders);
+        return report;
+    }
+
 }
