@@ -12,7 +12,7 @@ public class Order {
     private int quantity;
     private int tableNumber;
     private LocalDateTime orderedTime;
-    private LocalDateTime fulfilmentTime = null;
+    private LocalDateTime fulfilmentTime = LocalDateTime.now();
     private boolean isPaid;
 
 //    endregion
@@ -32,6 +32,7 @@ public class Order {
         this.dishId = dish.getId();
         this.quantity = quantity;
         this.tableNumber = tableNumber;
+        this.orderedTime = LocalDateTime.now();
         this.isPaid = isPaid;
         this.orderId = nextId;
         nextId++;
@@ -66,10 +67,11 @@ public class Order {
     }
 
     private String paidStringFormat() {
+        String output = "";
         if (isPaid) {
-            return "zaplaceno";
+            output = "zaplaceno";
         }
-        return "";
+        return output;
     }
 
     private String quantityStringFormat() {
