@@ -1,6 +1,8 @@
 package hrakuun.ja.projekt.restaurace;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Order {
     // region variables
@@ -26,30 +28,66 @@ public class Order {
         nextId++;
     }
 
-    public Order(Dish dish, int quantity, int tableNumber, LocalDateTime orderedTime, boolean isPaid) {
+    public Order(Dish dish, int quantity, int tableNumber, boolean isPaid) {
         this.dishId = dish.getId();
         this.quantity = quantity;
         this.tableNumber = tableNumber;
-        this.orderedTime = orderedTime;
         this.isPaid = isPaid;
         this.orderId = nextId;
         nextId++;
     }
 
-    public Order(int orderId, int dishId, int quantity, int tableNumber, LocalDateTime orderedTime, boolean isPaid) {
+    public Order(int orderId, int dishId, int quantity, int tableNumber, LocalDateTime orderedTime, LocalDateTime fulfilmentTime, boolean isPaid) {
         this.orderId = orderId;
         this.dishId = dishId;
         this.quantity = quantity;
         this.tableNumber = tableNumber;
         this.orderedTime = orderedTime;
+        this.fulfilmentTime = fulfilmentTime;
         this.isPaid = isPaid;
     }
     //    endregion
 
     //    region methods
     public boolean isCompleted() {
-        return fulfilmentTime.equals(null);
+        return fulfilmentTime != null;
     }
+
+    private BigDecimal totalPrice() {
+        return CookBook.getDishById(dishId).getPrice().multiply(BigDecimal.valueOf(quantity));
+    }
+
+    private String getOrderedTimeInTimeFormat() {
+        return orderedTime.format(DateTimeFormatter.ofPattern("hh:mm"));
+    }
+
+    private String getFulfilmentTimeInTimeFormat() {
+        return fulfilmentTime.format(DateTimeFormatter.ofPattern("hh:mm"));
+    }
+
+    private String paidStringFormat() {
+        if (isPaid) {
+            return "zaplaceno";
+        }
+        return "";
+    }
+
+    private String quantityStringFormat() {
+        if (quantity > 1) {
+            return quantity + "x";
+        }
+        return "";
+    }
+
+    public String stringOutput() {
+        char space = ' ';
+        String tabulator = "\t";
+        Dish dish = CookBook.getDishById(dishId);
+        return dish.getTitle() + space + quantityStringFormat() + space + "(" + totalPrice() + " Kč):"
+                + tabulator + getOrderedTimeInTimeFormat() + "-"
+                + getFulfilmentTimeInTimeFormat() + tabulator + paidStringFormat();
+    }
+
 //    endregion
 
     //    region set/get
