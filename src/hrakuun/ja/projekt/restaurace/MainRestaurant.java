@@ -12,7 +12,7 @@ public class MainRestaurant {
 
 
         try{
-            loadFilesOnStart();
+            loadFiles();
             cookBook.addDish(water);
             cookBook.addDish(juice);
             cookBook.removeDish(water);
@@ -21,9 +21,8 @@ public class MainRestaurant {
             System.err.println(e.getLocalizedMessage());
         }
 
-
     }
-    public static void loadFilesOnStart() throws RestaurantException {
+    public static void loadFiles() throws RestaurantException {
         CookBook.loadCookBookFile(Settings.getCookBookFilePath());
         OrderManager.loadOrdersFile(Settings.getOrdersFilePath());
     }
