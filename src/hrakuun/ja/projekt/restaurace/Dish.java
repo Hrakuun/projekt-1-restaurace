@@ -17,11 +17,7 @@ public class Dish {
     //    endregion
 // region constructors
     public Dish(String title, BigDecimal price, int preparationTime, String image) throws RestaurantException {
-        this.title = title;
-        setPrice(price);
-        setPreparationTime(preparationTime);
-        setImage(image);
-        setId(nextId);
+        this(nextId, title,price,preparationTime,image);
         nextId++;
     }
 

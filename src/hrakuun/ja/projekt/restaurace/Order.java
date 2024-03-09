@@ -18,23 +18,13 @@ public class Order {
 //    endregion
 
     //    region constructors
-    public Order(int dishId, int quantity, int tableNumber, LocalDateTime orderedTime, boolean isPaid) {
-        this.dishId = dishId;
-        this.quantity = quantity;
-        this.tableNumber = tableNumber;
-        this.orderedTime = orderedTime;
-        this.isPaid = isPaid;
-        this.orderId = nextId;
+    public Order(int dishId, int quantity, int tableNumber, boolean isPaid) {
+        this(nextId,dishId,quantity,tableNumber, LocalDateTime.now(),null,isPaid);
         nextId++;
     }
 
     public Order(Dish dish, int quantity, int tableNumber, boolean isPaid) {
-        this.dishId = dish.getId();
-        this.quantity = quantity;
-        this.tableNumber = tableNumber;
-        this.orderedTime = LocalDateTime.now();
-        this.isPaid = isPaid;
-        this.orderId = nextId;
+        this(nextId,dish.getId(),quantity,tableNumber,LocalDateTime.now(),null,isPaid);
         nextId++;
     }
 
