@@ -47,7 +47,7 @@ public class CookBook {
             while (scanner.hasNextLine()) {
                 lineCounter++;
                 String line = scanner.nextLine();
-                Dish dish = getDishFromLine(line);
+                Dish dish = getDishFromLine(line, lineCounter);
                 if (!cookBook.containsKey(dish.getId())) {
                     cookBook.put(dish.getId(), dish);
                 }
@@ -56,14 +56,18 @@ public class CookBook {
         } catch (FileNotFoundException e) {
             throw new RestaurantException("Soubor " + fileName + " nenalezen.\n" + e.getLocalizedMessage());
         } catch (NumberFormatException e) {
-            throw new RestaurantException("Neplatný formát čísel na řádku: " + lineCounter + "\n" + e.getLocalizedMessage());
-        } catch (NullPointerException | ClassCastException | UnsupportedOperationException | IllegalArgumentException e) {
+            throw new RestaurantException("Neplatný formát čísel na řádku: " + lineCounter + " v souboru: " + fileName + "\n" + e.getLocalizedMessage());
+        } catch (NullPointerException | ClassCastException | UnsupportedOperationException |
+                 IllegalArgumentException e) {
             throw new RestaurantException("Chyba při načítání dat ze souboru na řádku: " + lineCounter + "\n" + e.getLocalizedMessage());
         }
     }
 
-    private static Dish getDishFromLine(String line) throws RestaurantException {
+    private static Dish getDishFromLine(String line, int lineCounter) throws RestaurantException {
         String[] parts = line.split(Settings.getDelimiter());
+        if (parts.length != 5) {
+            throw new RestaurantException("Nesprávný počet parametrů na řádku číslo: " + lineCounter + " v souboru: " + fileName + "\n");
+        }
         int dishId = Integer.parseInt(parts[0]);
         String title = parts[1];
         BigDecimal price = BigDecimal.valueOf(Long.parseLong(parts[2]));
@@ -92,15 +96,10 @@ public class CookBook {
         }
     }
 
-    public static void updateCookBook() throws RestaurantException {
-        cookBook.clear();
-        loadFile(fileName);
-    }
-
 //    endregion
 //  region get/set
 
-    public Map<Integer, Dish> getCookBook() {
+    public static Map<Integer, Dish> getCookBook() {
         return new HashMap<>(cookBook);
     }
 
