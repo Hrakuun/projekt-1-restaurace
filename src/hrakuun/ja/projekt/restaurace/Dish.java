@@ -17,7 +17,7 @@ public class Dish {
     //    endregion
 // region constructors
     public Dish(String title, BigDecimal price, int preparationTime, String image) throws RestaurantException {
-        this(nextId, title,price,preparationTime,image);
+        this(nextId, title, price, preparationTime, image);
         nextId++;
     }
 
@@ -84,4 +84,12 @@ public class Dish {
         this.id = id;
     }
 //    endregion
+
+    @Override
+    public String toString() {
+        return "Dish{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                '}';
+    }
 }
