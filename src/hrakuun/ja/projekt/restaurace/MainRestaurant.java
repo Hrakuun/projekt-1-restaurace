@@ -1,5 +1,6 @@
 package hrakuun.ja.projekt.restaurace;
 
+// Discord name: hrakuun / Jan Maxa
 
 import java.math.BigDecimal;
 import java.util.List;
