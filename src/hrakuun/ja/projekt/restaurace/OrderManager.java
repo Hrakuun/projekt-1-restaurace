@@ -9,25 +9,26 @@ import java.time.LocalDate;
 
 public class OrderManager {
 
-    private static Map<Integer, Order> orders = new HashMap<>();
-    private static String ordersFile = Settings.getOrdersFilePath();
+    private static final Map<Integer, Order> orders = new HashMap<>();
+    private static final String ordersFile = Settings.getOrdersFilePath();
 
 
-    public void addOrder(Order order) throws RestaurantException {
+    public static void addOrder(Order order) throws RestaurantException {
         orders.put(order.getOrderId(), order);
-        saveOrdersFile(ordersFile);
+        saveOrdersFile();
     }
 
-    public void removeOrder(Order order) throws RestaurantException {
+    public static void removeOrder(Order order) throws RestaurantException {
         orders.remove(order.getOrderId());
-        saveOrdersFile(ordersFile);
+        saveOrdersFile();
     }
 
-    public void completeOrder(Order order) throws RestaurantException {
-        if (order.isPaid()) {
-            order.setFulfilmentTime(LocalDateTime.now());
-        }
-        saveOrdersFile(ordersFile);
+
+    public static void completeOrderById(int orderId) throws RestaurantException {
+        Order order = orders.get(orderId);
+        Dish dish = CookBook.getDishById(order.getDishId());
+        order.setFulfilmentTime(order.getOrderedTime().plusMinutes(dish.getPreparationTime()));
+        saveOrdersFile();
     }
 
     private static boolean doesFileExist(String fileName) {
@@ -46,7 +47,7 @@ public class OrderManager {
             while (scanner.hasNextLine()) {
                 lineCounter++;
                 String line = scanner.nextLine();
-                Order order = getOrderFromLine(line);
+                Order order = getOrderFromLine(line, lineCounter);
                 if (!orders.containsKey(order.getOrderId())) {
                     orders.put(order.getOrderId(), order);
                 }
@@ -61,21 +62,32 @@ public class OrderManager {
         }
     }
 
-    private static Order getOrderFromLine(String line) {
+    private static Order getOrderFromLine(String line, int lineCounter) throws RestaurantException {
         String[] parts = line.split(Settings.getDelimiter());
+        if (parts.length != 7) {
+            throw new RestaurantException("Nesprávný počet parametrů na řádku číslo: " + lineCounter + " v souboru: " + ordersFile + "\n");
+        }
         int orderId = Integer.parseInt(parts[0]);
         int dishId = Integer.parseInt(parts[1]);
         int quantity = Integer.parseInt(parts[2]);
         int tableNumber = Integer.parseInt(parts[3]);
         LocalDateTime orderedTime = LocalDateTime.parse(parts[4]);
-        LocalDateTime fulfilmentTime = LocalDateTime.parse(parts[5]);
+        LocalDateTime fulfilmentTime = readFulfilmentTime(parts[5]);
         boolean isPaid = Boolean.parseBoolean(parts[6]);
         return new Order(orderId, dishId, quantity, tableNumber, orderedTime, fulfilmentTime, isPaid);
     }
 
-    public void saveOrdersFile(String fileName) throws RestaurantException {
+    private static LocalDateTime readFulfilmentTime(String part) {
+        LocalDateTime fulfilmentTime = null;
+        if (!part.isEmpty()) {
+            fulfilmentTime = LocalDateTime.parse(part);
+        }
+        return fulfilmentTime;
+    }
+
+    public static void saveOrdersFile() throws RestaurantException {
         String delimiter = Settings.getDelimiter();
-        try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(fileName)))) {
+        try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(ordersFile)))) {
             for (Order order : orders.values()) {
                 writer.println(
                         order.getOrderId() + delimiter
@@ -83,20 +95,19 @@ public class OrderManager {
                                 + order.getQuantity() + delimiter
                                 + order.getTableNumber() + delimiter
                                 + order.getOrderedTime() + delimiter
-                                + order.getFulfilmentTime() + delimiter
+                                + order.fulfilmentTimeString() + delimiter
                                 + order.isPaid()
                 );
             }
         } catch (FileNotFoundException e) {
-            throw new RestaurantException("Soubor " + fileName + " nenalezen!\n" + e.getLocalizedMessage());
+            throw new RestaurantException("Soubor " + ordersFile + " nenalezen!\n" + e.getLocalizedMessage());
         } catch (IOException e) {
-            throw new RestaurantException("Chyba při zápisu do souboru: " + fileName + ":\n" + e.getLocalizedMessage());
+            throw new RestaurantException("Chyba při zápisu do souboru: " + ordersFile + ":\n" + e.getLocalizedMessage());
         }
     }
 
     public static List<Order> getTodayOrders() {
         List<Order> todayOrders = new ArrayList<>();
-//        getAllOrders().stream().filter(order -> order.getOrderedTime().toLocalDate().atStartOfDay().equals(LocalDate.now())).toList(order);
         for (Order order : getAllOrders()) {
             if (order.getOrderedTime().toLocalDate().equals(LocalDate.now())) {
                 todayOrders.add(order);
