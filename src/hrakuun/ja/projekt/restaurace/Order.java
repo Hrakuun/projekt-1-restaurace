@@ -12,19 +12,14 @@ public class Order {
     private int quantity;
     private int tableNumber;
     private LocalDateTime orderedTime;
-    private LocalDateTime fulfilmentTime = LocalDateTime.now();
+    private LocalDateTime fulfilmentTime;
     private boolean isPaid;
 
 //    endregion
 
     //    region constructors
     public Order(int dishId, int quantity, int tableNumber, boolean isPaid) {
-        this(nextId,dishId,quantity,tableNumber, LocalDateTime.now(),null,isPaid);
-        nextId++;
-    }
-
-    public Order(Dish dish, int quantity, int tableNumber, boolean isPaid) {
-        this(nextId,dish.getId(),quantity,tableNumber,LocalDateTime.now(),null,isPaid);
+        this(nextId, dishId, quantity, tableNumber, LocalDateTime.now(), null, isPaid);
         nextId++;
     }
 
@@ -44,8 +39,10 @@ public class Order {
         return fulfilmentTime != null;
     }
 
-    private BigDecimal totalPrice() {
-        return CookBook.getDishById(dishId).getPrice().multiply(BigDecimal.valueOf(quantity));
+    public BigDecimal totalPrice() {
+        BigDecimal totalPrice;
+        totalPrice = CookBook.getDishById(dishId).getPrice().multiply(BigDecimal.valueOf(quantity));
+        return totalPrice;
     }
 
     private String getOrderedTimeInTimeFormat() {
@@ -53,7 +50,10 @@ public class Order {
     }
 
     private String getFulfilmentTimeInTimeFormat() {
-        return fulfilmentTime.format(DateTimeFormatter.ofPattern("hh:mm"));
+        if (fulfilmentTime != null) {
+            return fulfilmentTime.format(DateTimeFormatter.ofPattern("hh:mm"));
+        }
+        return "";
     }
 
     private String paidStringFormat() {
@@ -71,6 +71,13 @@ public class Order {
         return "";
     }
 
+    public String fulfilmentTimeString() {
+        if (fulfilmentTime == null) {
+            return "";
+        }
+        return fulfilmentTime.toString();
+    }
+
     public String stringOutput() {
         char space = ' ';
         String tabulator = "\t";
@@ -80,6 +87,18 @@ public class Order {
                 + getFulfilmentTimeInTimeFormat() + tabulator + paidStringFormat();
     }
 
+    @Override
+    public String toString() {
+        return "Order{" +
+                "orderId=" + orderId +
+                ", dishId=" + dishId +
+                ", quantity=" + quantity +
+                ", tableNumber=" + tableNumber +
+                ", orderedTime=" + orderedTime +
+                ", fulfilmentTime=" + fulfilmentTime +
+                ", isPaid=" + isPaid +
+                '}';
+    }
 //    endregion
 
     //    region set/get
